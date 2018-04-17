@@ -118,6 +118,7 @@ export default class extends Component {
       PropTypes.number,
     ]),
     pagingEnabled: PropTypes.bool,
+    pagesPerView: PropTypes.number,
     showsHorizontalScrollIndicator: PropTypes.bool,
     showsVerticalScrollIndicator: PropTypes.bool,
     bounces: PropTypes.bool,
@@ -153,7 +154,8 @@ export default class extends Component {
    */
   static defaultProps = {
     horizontal: true,
-    pagingEnabled: true,
+    pagingEnabled: false,
+    pagesPerView: 1,
     showsHorizontalScrollIndicator: false,
     showsVerticalScrollIndicator: false,
     bounces: false,
@@ -395,7 +397,7 @@ export default class extends Component {
     const state = this.state
     let index = state.index
     const diff = offset[dir] - this.internals.offset[dir]
-    const step = dir === 'x' ? state.width : state.height
+    const step = dir === 'x' ? state.width / this.props.pagesPerView : state.height
     let loopJump = false
 
     // Do nothing if offset no change.
@@ -630,6 +632,8 @@ export default class extends Component {
           onScrollBeginDrag={this.onScrollBegin}
           onMomentumScrollEnd={this.onScrollEnd}
           onScrollEndDrag={this.onScrollEndDrag}
+          snapToInterval={this.state.width / this.props.pagesPerView}
+          snapToAlignment='start'
           style={this.props.scrollViewStyle}>
           {pages}
         </ScrollView>
@@ -670,13 +674,14 @@ export default class extends Component {
       renderPagination,
       showsButtons,
       showsPagination,
+      pagesPerView
     } = this.props;
     // let dir = state.dir
     // let key = 0
     const loopVal = loop ? 1 : 0
     let pages = []
 
-    const pageStyle = [{width: width, height: height}, styles.slide]
+    const pageStyle = [{width: width / pagesPerView, height: height}, styles.slide]
     const pageStyleLoading = {
       width,
       height,
